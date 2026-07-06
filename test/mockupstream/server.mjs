@@ -49,7 +49,9 @@ http.createServer(async (req, res) => {
     if (!MODELS.some(m => m.id === model)) {
       return json(res, 404, { error: { message: `model ${model} not found`, type: 'invalid_request_error' } });
     }
-    const reply = `mock@${PORT} reply from ${model}`;
+    // 回显收到的参数键，供 A5 验证网关的参数增删是否真正生效
+    const paramKeys = Object.keys(body).filter(k => !['model', 'messages', 'stream'].includes(k)).sort();
+    const reply = `mock@${PORT} reply from ${model} params=[${paramKeys.join(',')}]`;
     const usage = { prompt_tokens: 12, completion_tokens: 8, total_tokens: 20 };
     const id = 'chatcmpl-mock' + PORT;
 
