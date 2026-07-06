@@ -138,6 +138,11 @@ func getPreferredModelOwners(modelNames []string, groups []string) map[string]st
 	ownerByChannelType := make(map[int]string)
 	owners := make(map[string]string, len(channelTypes))
 	for modelName, channelType := range channelTypes {
+		// 转售场景下 owned_by 不能暴露背后渠道（如 openrouter）；模型名自带厂商前缀时以前缀为准
+		if vendor, _, found := strings.Cut(modelName, "/"); found && vendor != "" {
+			owners[modelName] = vendor
+			continue
+		}
 		owner, ok := ownerByChannelType[channelType]
 		if !ok {
 			owner = channelOwnerName(channelType)
