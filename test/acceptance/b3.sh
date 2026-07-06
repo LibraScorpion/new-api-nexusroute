@@ -14,7 +14,7 @@ admin() { curl -s -b "$JAR" -H 'content-type: application/json' -H 'New-Api-User
 
 # ---- 1) TTFT 分渠道记录：mock 注入 300ms 首字延迟，流式调用后日志 frt >= 300 ----
 lsof -ti tcp:8100 -sTCP:LISTEN | xargs kill 2>/dev/null; sleep 0.5
-(cd "$REPO_DIR" && TTFT_MS=300 node test/mockupstream/server.mjs > /dev/null 2>&1 &)
+(cd "$REPO_DIR" && TTFT_MS=300 node test/mockupstream/server.mjs > /dev/null 2>&1 < /dev/null &)
 sleep 1
 admin PUT /api/channel/ '{"id":1,"base_url":"http://localhost:8100","priority":10}' > /dev/null
 admin POST /api/channel/1/status '{"status":1}' > /dev/null
@@ -32,7 +32,7 @@ fi
 
 # 恢复无延迟 mock
 lsof -ti tcp:8100 -sTCP:LISTEN | xargs kill 2>/dev/null; sleep 0.5
-(cd "$REPO_DIR" && node test/mockupstream/server.mjs > /dev/null 2>&1 &)
+(cd "$REPO_DIR" && node test/mockupstream/server.mjs > /dev/null 2>&1 < /dev/null &)
 sleep 1
 
 # ---- 2) 持续异常自动禁用：开启自动禁用，渠道1指向永远500的上游 ----

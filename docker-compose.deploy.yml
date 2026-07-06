@@ -1,0 +1,58 @@
+# 算力路由 MVP — B 端交付用 Compose（基于本仓库源码构建，含二开：owned_by 厂商化、开票接口）
+# 使用: docker compose -f docker-compose.deploy.yml up -d
+# ⚠️ 上线前必改：POSTGRES_PASSWORD / redis 密码 / SESSION_SECRET
+
+services:
+  gateway:
+    build: .
+    container_name: astro-gateway
+    restart: always
+    command: --log-dir /app/logs
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/data
+      - ./logs:/app/logs
+    environment:
+      - SQL_DSN=postgresql://root:CHANGE_ME@postgres:5432/new-api
+      - REDIS_CONN_STRING=redis://:CHANGE_ME@redis:6379
+      - SESSION_SECRET=CHANGE_ME_RANDOM_STRING
+      - CRYPTO_SECRET=CHANGE_ME_RANDOM_STRING
+      - TZ=Asia/Shanghai
+      - ERROR_LOG_ENABLED=true
+      - BATCH_UPDATE_ENABLED=true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:3000/api/status | grep -o '\"success\":\\s*true' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7
+    container_name: astro-redis
+    restart: always
+    command: ["redis-server", "--requirepass", "CHANGE_ME"]
+
+  postgres:
+    image: postgres:15
+    container_name: astro-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: CHANGE_ME
+      POSTGRES_DB: new-api
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d new-api"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pg_data:
