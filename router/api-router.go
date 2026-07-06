@@ -262,6 +262,13 @@ func SetApiRouter(router *gin.Engine) {
 			redemptionRoute.DELETE("/invalid", controller.DeleteInvalidRedemption)
 			redemptionRoute.DELETE("/:id", controller.DeleteRedemption)
 		}
+		invoiceRoute := apiRouter.Group("/invoice")
+		{
+			invoiceRoute.POST("/", middleware.UserAuth(), controller.SubmitInvoiceRequest)
+			invoiceRoute.GET("/self", middleware.UserAuth(), controller.GetMyInvoiceRequests)
+			invoiceRoute.GET("/", middleware.AdminAuth(), controller.GetAllInvoiceRequests)
+			invoiceRoute.POST("/:id/complete", middleware.AdminAuth(), controller.CompleteInvoiceRequest)
+		}
 		logRoute := apiRouter.Group("/log")
 		logRoute.GET("/", middleware.AdminAuth(), controller.GetAllLogs)
 		// Legacy synchronous direct-delete route used only by the classic frontend.
