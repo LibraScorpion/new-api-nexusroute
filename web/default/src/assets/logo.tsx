@@ -37,10 +37,10 @@ export function Logo({ className, ...props }: SVGProps<SVGSVGElement>) {
       {...props}
     >
       <title>agent-api</title>
-      {/* 字标：几何单层 a（agent）+ 橙色端点（api endpoint） */}
-      <circle cx='10' cy='14' r='5.5' />
-      <path d='M15.5 8.5v11' />
-      <circle cx='20' cy='19.5' r='1.6' fill='#C55A11' stroke='none' />
+      {/* 字标：几何单层 a（agent）+ 橙色端点（api endpoint）；包围盒居中，适配圆形裁切 */}
+      <circle cx='9.6' cy='11.8' r='4.4' />
+      <path d='M14 7.4v8.8' />
+      <circle cx='18.2' cy='15.5' r='1.7' fill='#C55A11' stroke='none' />
     </svg>
   )
 }
