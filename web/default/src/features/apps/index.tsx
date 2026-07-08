@@ -1,6 +1,7 @@
 /*
 agent-api Apps 页：应用消耗排行（对标 openrouter.ai/apps）
-归因：客户端调用网关时自报 X-Title 请求头
+归因遵循 OpenRouter 规范：HTTP-Referer 必填（域名=标识），
+X-OpenRouter-Title/X-Title 显示名，X-OpenRouter-Categories 分类
 */
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -12,6 +13,9 @@ import { api } from '@/lib/api'
 
 type AppStat = {
   app: string
+  title: string
+  url: string
+  categories: string[]
   tokens: number
   requests: number
 }
@@ -19,9 +23,17 @@ type AppStat = {
 type AppTrendingStat = AppStat & { growth_percent: number }
 
 type AppRankings = {
-  most_popular: AppStat[]
-  trending: AppTrendingStat[]
+  most_popular: AppStat[] | null
+  trending: AppTrendingStat[] | null
+  top_categories: Record<string, AppStat[]> | null
 }
+
+const CATEGORY_GROUPS: { key: string; label: string }[] = [
+  { key: 'coding', label: 'Top Coding Agents' },
+  { key: 'productivity', label: 'Top Productivity' },
+  { key: 'creative', label: 'Top Creative' },
+  { key: 'entertainment', label: 'Top Entertainment' },
+]
 
 async function getAppRankings(): Promise<AppRankings> {
   const res = await api.get('/api/apps/rankings')
@@ -58,6 +70,20 @@ function AppAvatar({ name, size = 'md' }: { name: string; size?: 'md' | 'lg' }) 
   )
 }
 
+function AppDomain({ app }: { app: AppStat }) {
+  if (!app.url) return null
+  return (
+    <a
+      href={app.url}
+      target='_blank'
+      rel='noopener noreferrer'
+      className='text-muted-foreground block truncate text-xs hover:underline'
+    >
+      {app.url.replace(/^https?:\/\//, '')}
+    </a>
+  )
+}
+
 export function Apps() {
   const { t } = useTranslation()
   const { data, isLoading } = useQuery({
@@ -67,6 +93,7 @@ export function Apps() {
 
   const popular = data?.most_popular ?? []
   const trending = data?.trending ?? []
+  const topCategories = data?.top_categories ?? {}
 
   return (
     <PublicLayout>
@@ -75,7 +102,7 @@ export function Apps() {
           <h1 className='text-3xl font-bold'>{t('App & Agent Rankings')}</h1>
           <p className='text-muted-foreground text-sm'>
             {t(
-              'Largest apps and agents by token usage on this gateway. Send the X-Title header to appear here.'
+              'Largest apps and agents by token usage on this gateway. Send the HTTP-Referer and X-Title headers to appear here.'
             )}
           </p>
         </div>
@@ -92,7 +119,7 @@ export function Apps() {
           <Card>
             <CardContent className='text-muted-foreground py-16 text-center text-sm'>
               {t(
-                'No app usage recorded yet. Apps appear automatically once they call the API with an X-Title header.'
+                'No app usage recorded yet. Apps appear automatically once they call the API with attribution headers.'
               )}
             </CardContent>
           </Card>
@@ -106,13 +133,16 @@ export function Apps() {
                 <Card key={app.app}>
                   <CardContent className='space-y-3 p-5'>
                     <div className='flex items-start justify-between gap-2'>
-                      <div className='font-semibold'>{app.app}</div>
-                      <AppAvatar name={app.app} size='lg' />
+                      <div className='min-w-0'>
+                        <div className='truncate font-semibold'>
+                          {app.title}
+                        </div>
+                        <AppDomain app={app} />
+                      </div>
+                      <AppAvatar name={app.title} size='lg' />
                     </div>
                     <div className='text-muted-foreground text-xs'>
-                      {formatTokens(app.requests)} {t('requests')}
-                    </div>
-                    <div className='text-muted-foreground text-xs'>
+                      {formatTokens(app.requests)} {t('requests')} ·{' '}
                       {formatTokens(app.tokens)} tokens
                     </div>
                   </CardContent>
@@ -134,9 +164,9 @@ export function Apps() {
               {trending.slice(0, 6).map((app) => (
                 <Card key={app.app}>
                   <CardContent className='space-y-2 p-4'>
-                    <AppAvatar name={app.app} />
+                    <AppAvatar name={app.title} />
                     <div className='truncate text-sm font-medium'>
-                      {app.app}
+                      {app.title}
                     </div>
                     <div className='flex items-center justify-between text-xs'>
                       <span className='text-muted-foreground'>
@@ -155,6 +185,43 @@ export function Apps() {
           </section>
         )}
 
+        {CATEGORY_GROUPS.some((g) => (topCategories[g.key] ?? []).length > 0) && (
+          <div className='grid gap-6 lg:grid-cols-2'>
+            {CATEGORY_GROUPS.filter(
+              (g) => (topCategories[g.key] ?? []).length > 0
+            ).map((group) => (
+              <section key={group.key} className='space-y-3'>
+                <h2 className='text-lg font-semibold'>{t(group.label)}</h2>
+                <Card>
+                  <CardContent className='divide-y p-0'>
+                    {(topCategories[group.key] ?? []).map((app, i) => (
+                      <div
+                        key={app.app}
+                        className='flex items-center gap-3 px-4 py-2.5'
+                      >
+                        <span className='text-muted-foreground w-5 text-right text-sm'>
+                          {i + 1}.
+                        </span>
+                        <AppAvatar name={app.title} />
+                        <div className='min-w-0 flex-1'>
+                          <div className='truncate text-sm font-medium'>
+                            {app.title}
+                          </div>
+                          <AppDomain app={app} />
+                        </div>
+                        <div className='text-sm'>
+                          {formatTokens(app.tokens)}{' '}
+                          <span className='text-muted-foreground'>tokens</span>
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </section>
+            ))}
+          </div>
+        )}
+
         {popular.length > 0 && (
           <section className='space-y-4'>
             <h2 className='text-xl font-semibold'>{t('All Apps')}</h2>
@@ -168,12 +235,15 @@ export function Apps() {
                     <span className='text-muted-foreground w-6 text-right text-sm'>
                       {i + 1}.
                     </span>
-                    <AppAvatar name={app.app} />
+                    <AppAvatar name={app.title} />
                     <div className='min-w-0 flex-1'>
                       <div className='truncate text-sm font-medium'>
-                        {app.app}
+                        {app.title}
                       </div>
-                      <div className='text-muted-foreground text-xs'>
+                      <div className='text-muted-foreground truncate text-xs'>
+                        {app.url
+                          ? app.url.replace(/^https?:\/\//, '') + ' · '
+                          : ''}
                         {formatTokens(app.requests)} {t('requests')}
                       </div>
                     </div>

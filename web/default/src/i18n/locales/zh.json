@@ -5074,12 +5074,16 @@
     "Zhipu V4": "智谱 V4",
     "Zoom": "缩放",
     "App & Agent Rankings": "应用与 Agent 排行",
-    "Largest apps and agents by token usage on this gateway. Send the X-Title header to appear here.": "按 token 消耗排名的应用与 Agent。调用 API 时携带 X-Title 请求头即可自动上榜。",
-    "No app usage recorded yet. Apps appear automatically once they call the API with an X-Title header.": "暂无应用用量记录。应用调用 API 时携带 X-Title 请求头即可自动出现在这里。",
     "Most Popular": "最受欢迎",
     "Trending": "增长最快",
     "Fastest growing this week": "本周增速最快",
     "All Apps": "全部应用",
-    "requests": "次请求"
+    "requests": "次请求",
+    "Largest apps and agents by token usage on this gateway. Send the HTTP-Referer and X-Title headers to appear here.": "按 token 消耗排名的应用与 Agent。调用 API 时携带 HTTP-Referer 与 X-Title 请求头即可自动上榜。",
+    "No app usage recorded yet. Apps appear automatically once they call the API with attribution headers.": "暂无应用用量记录。应用调用 API 时携带归因请求头即可自动出现在这里。",
+    "Top Coding Agents": "编程 Agent 榜",
+    "Top Productivity": "生产力榜",
+    "Top Creative": "创意榜",
+    "Top Entertainment": "娱乐榜"
   }
 }

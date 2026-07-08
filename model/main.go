@@ -280,6 +280,7 @@ func migrateDB() error {
 		&Midjourney{},
 		&TopUp{},
 		&InvoiceRequest{},
+		&AppInfo{},
 		&QuotaData{},
 		&Task{},
 		&Model{},

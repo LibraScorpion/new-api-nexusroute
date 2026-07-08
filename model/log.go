@@ -382,7 +382,7 @@ func RecordConsumeLog(c *gin.Context, userId int, params RecordConsumeLogParams)
 		}(),
 		RequestId:         requestId,
 		UpstreamRequestId: upstreamRequestId,
-		App:               sanitizeAppTitle(c.GetHeader("X-Title")),
+		App:               recordAppAttribution(c),
 		Other:             otherStr,
 	}
 	err := createLog(log)
