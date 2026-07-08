@@ -86,6 +86,9 @@ export function useTopNavLinks(): TopNavLink[] {
     links.push({ title: t('Rankings'), href: '/rankings', requiresAuth })
   }
 
+  // Apps 消耗排行（对标 openrouter.ai/apps）
+  links.push({ title: t('Apps'), href: '/apps' })
+
   // Docs (supports external links)
   if (modules?.docs !== false) {
     if (docsLink) {
