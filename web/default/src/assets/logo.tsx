@@ -36,8 +36,11 @@ export function Logo({ className, ...props }: SVGProps<SVGSVGElement>) {
       className={cn('size-6', className)}
       {...props}
     >
-      <title>New API</title>
-      <path d='M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3' />
+      <title>agent-api</title>
+      {/* 字标：几何单层 a（agent）+ 橙色端点（api endpoint） */}
+      <circle cx='10' cy='14' r='5.5' />
+      <path d='M15.5 8.5v11' />
+      <circle cx='20' cy='19.5' r='1.6' fill='#C55A11' stroke='none' />
     </svg>
   )
 }
