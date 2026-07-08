@@ -49,31 +49,32 @@ function EmptyAboutState() {
           <p>
             {t('New API Project Repository:')}{' '}
             <a
-              href='https://github.com/QuantumNous/new-api'
+              href='https://github.com/LibraScorpion/new-api-nexusroute'
               target='_blank'
               rel='noopener noreferrer'
               className='text-primary hover:underline'
             >
-              {t('https://github.com/QuantumNous/new-api')}
+              https://github.com/LibraScorpion/new-api-nexusroute
             </a>
           </p>
           <p className='text-muted-foreground'>
+            agent-api © {currentYear} {t('| Based on')}{' '}
             <a
               href='https://github.com/QuantumNous/new-api'
               target='_blank'
               rel='noopener noreferrer'
               className='text-primary hover:underline'
             >
-              {t('NewAPI')}
+              New API
             </a>{' '}
-            © {currentYear}{' '}
+            ©{' '}
             <a
               href='https://github.com/QuantumNous'
               target='_blank'
               rel='noopener noreferrer'
               className='text-primary hover:underline'
             >
-              {t('QuantumNous')}
+              QuantumNous
             </a>{' '}
             {t('| Based on')}{' '}
             <a
@@ -97,7 +98,7 @@ function EmptyAboutState() {
           <p className='text-muted-foreground'>
             {t('This project must be used in compliance with the')}{' '}
             <a
-              href='https://github.com/QuantumNous/new-api/blob/main/LICENSE'
+              href='https://github.com/LibraScorpion/new-api-nexusroute/blob/main/LICENSE'
               target='_blank'
               rel='noopener noreferrer'
               className='text-primary hover:underline'
